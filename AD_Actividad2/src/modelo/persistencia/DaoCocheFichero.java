@@ -14,9 +14,9 @@ import java.util.List;
 import modelo.entidad.Coche;
 
 public class DaoCocheFichero {
-	private static final String NOMBRE_FICHERO = "videojuegos.txt";
+	private static final String NOMBRE_FICHERO = "coches.dat";
 
-	public Coche getByID(String id) throws Exception {
+	public Coche getByID(long id) throws Exception {
 		Coche v = null;
 		try (FileInputStream fr = new FileInputStream(NOMBRE_FICHERO); ObjectInputStream br = new ObjectInputStream(fr)) {
 
