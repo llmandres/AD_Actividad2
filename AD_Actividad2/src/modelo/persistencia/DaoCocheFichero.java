@@ -58,7 +58,7 @@ public class DaoCocheFichero {
 			throw e;
 		}
 	}
-	public void eliminarVideojuego(long id) throws Exception {
+	public void eliminarCoche(long id) throws Exception {
 	    List<Coche> coches = new ArrayList<>(); 
 	    boolean encontrado = false;
 
