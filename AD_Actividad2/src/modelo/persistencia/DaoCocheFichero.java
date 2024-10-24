@@ -10,37 +10,47 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 import modelo.entidad.Coche;
 
 public class DaoCocheFichero {
 	private static final String NOMBRE_FICHERO = "coches.dat";
 
-	public Coche getByID(long id) throws Exception {
+	public Coche getByID(long id) {
 		Coche v = null;
+	    File file = new File(NOMBRE_FICHERO);
+	    if (!file.exists()) {
+	          try {
+				file.createNewFile();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+	    }
 		try (FileInputStream fr = new FileInputStream(NOMBRE_FICHERO); ObjectInputStream br = new ObjectInputStream(fr)) {
 
 				int bytesEnBuffer = fr.available();
 				Coche c = null;
-				while (bytesEnBuffer > 0) {//mientras haya bytes que leer, sigo leyendo objetos
+				while (bytesEnBuffer > 0) {
 					try {
 						c = (Coche) br.readObject();
+						if(c.getId() == id) {
 						Coche c1 = new Coche();
 						c1.setId(c.getId());
 						c1.setMarca(c.getMarca());
 						c1.setModelo(c.getMarca());
 						c1.setTipoMotor(c.getTipoMotor());
+						if (c1.getId() == id) 
 						return c1;
+						}
 					} catch (IOException e2) {
-						System.out.println("Error al leer los contactos de la agenda");
+
 						System.out.println(e2.getMessage());
 					} catch (ClassNotFoundException e3) {
-						System.out.println("La clase Contacto no est� cargada en memoria");
 						System.out.println(e3.getMessage());
 					}
-					bytesEnBuffer = fr.available();//preguntamos si hay m�s contenido disponible
-												//este metodo nos devuelve el numero de bytes que quedan por leer
-					System.out.println("Bytes pendientes en buffer: " + bytesEnBuffer);
+					bytesEnBuffer = fr.available();
+	
 				}
 			}catch (IOException e) {
 			}	
@@ -48,15 +58,30 @@ public class DaoCocheFichero {
 		} 
 	
 	public void register(Coche c) throws Exception {
-		File f = new File(NOMBRE_FICHERO);
-		if (!f.exists()) {
-			throw new Exception("fichero no existe");
-		}
-		try (FileOutputStream fw = new FileOutputStream(NOMBRE_FICHERO, true); ObjectOutputStream bw = new ObjectOutputStream(fw)) {
-			bw.writeObject(c);
-		} catch (Exception e) {
-			throw e;
-		}
+	    File file = new File(NOMBRE_FICHERO);
+	    if (!file.exists()) {
+	        try {
+	            if (file.createNewFile()) {
+
+	            } else {
+
+	                return;
+	            }
+	        } catch (IOException e) {
+
+	            return;
+	        }
+	    }
+
+	    List<Coche> coches = listarCoches(); 
+	    coches.add(c); 
+	    try (ObjectOutputStream bw = new ObjectOutputStream(new FileOutputStream(NOMBRE_FICHERO))) {
+	        for (Coche coche : coches) {
+	            bw.writeObject(coche); 
+	        }
+	    } catch (Exception e) {
+	        throw e;
+	    }
 	}
 	public void eliminarCoche(long id) throws Exception {
 	    List<Coche> coches = new ArrayList<>(); 
@@ -74,7 +99,7 @@ public class DaoCocheFichero {
 	            } catch (EOFException e) {
 	                break; 
 	            } catch (IOException | ClassNotFoundException e) {
-	                System.out.println("Error al leer el archivo: " + e.getMessage());
+	 
 	                throw e; 
 	            }
 	        }
@@ -107,19 +132,39 @@ public class DaoCocheFichero {
 					c1.setTipoMotor(c.getTipoMotor());
 					listaCoches.add(c1);
 				} catch (IOException e2) {
-					System.out.println("Error al leer los contactos de la agenda");
+
 					System.out.println(e2.getMessage());
 				} catch (ClassNotFoundException e3) {
-					System.out.println("La clase Contacto no est� cargada en memoria");
+
 					System.out.println(e3.getMessage());
 				}
 				bytesEnBuffer = fr.available();
 
-				System.out.println("Bytes pendientes en buffer: " + bytesEnBuffer);
+	
 			}
 		}catch (IOException e) {
 		}	
 		return listaCoches;
+	}
+	public long generarId() {
+		Random r = new Random();
+		boolean distinto = false;
+		long id =r.nextLong(1, 1000000);;
+		try {
+			 for (Coche c : listarCoches()){
+				do {
+				if (id == c.getId()) {
+					id = r.nextLong(1, 1000000);
+				}else {
+					distinto = true;
+				}
+				}while(!distinto);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return id;
+		
 	}
 
 }

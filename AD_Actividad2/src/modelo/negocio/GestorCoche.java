@@ -18,21 +18,19 @@ public class GestorCoche {
 	 *         valido, <b>2</b> el Coche existe pero no es valido y <b>404</b>
 	 *         en caso de que haya algún problema en el de entrada salida
 	 */
-	public int validarVideojuego(Coche c) {
-		dc = new DaoCocheFichero();
-		try {
-			Coche cFichero = dc.getByID(c.getId());
-			if (cFichero == null) {
-				return 0;
-			}
-			if (cFichero.equals(c)) {
-				return 1;
-			} else {
-				return 2;
-			}
-		} catch (Exception e) {
-			return 404;
-		}
+	public int validarCoche(long id) {
+	    dc = new DaoCocheFichero();
+	    try {
+	        Coche c = dc.getByID(id); 
+	        if (c == null) {
+	            return 0;
+	        }else {
+	        return 1; 
+	        }
+	    } catch (Exception e) {
+	        e.printStackTrace(); 
+	        return 404; 
+	    }
 	}
 	/**
 	 * Método que guarda un Coche pasado por parametro
@@ -44,6 +42,7 @@ public class GestorCoche {
 	 *         entrada salida
 	 */
 	public int guardar(Coche c) {
+		
 		if (c == null) {
 			return 0;
 		}
@@ -62,7 +61,7 @@ public class GestorCoche {
 			return 500;
 		}
 	}
-	public List<Coche> listarVideojuego() throws Exception {
+	public List<Coche> listarCoche() throws Exception {
 		dc = new DaoCocheFichero();
 
 		return dc.listarCoches();
@@ -75,6 +74,15 @@ public class GestorCoche {
 			e.printStackTrace();
 		}
 
+	}
+	public long randomID() {
+		dc = new DaoCocheFichero();
+		return dc.generarId();
+	}
+	public Coche devolverUnCoche(long id) throws Exception {
+		dc = new DaoCocheFichero();
+			Coche c = dc.getByID(id);
+			return c;
 	}
 
 }
